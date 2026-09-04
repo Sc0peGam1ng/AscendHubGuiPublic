@@ -1523,7 +1523,11 @@ function ClickGUI:AddCategory(name, icon, color)
         ContentScroll.CanvasPosition = Vector2.new(0, 0)
     end)
     function data:AddSection(title, desc) return makeSection(page, title, desc) end
-    function data:AddLabel(text) return makeLabel(page, text) end
+    function data:AddLabel(text)
+        local section = makeSection(page, nil, nil)
+        local label = ui("TextLabel", section, {Size = UDim2.new(1, 0, 0, 28), BackgroundTransparency = 1, Text = tostring(text or ""), TextColor3 = C.TS, TextSize = 13, Font = FONT, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 8})
+        return {SetText = function(_, value) label.Text = tostring(value or "") end}
+    end
     function data:AddToggle(text, default, cb) return makeToggle(data:AddSection(nil, nil), text, nil, default, cb) end
     function data:AddButton(text, cb) return makeButton(data:AddSection(nil, nil), text, nil, cb) end
     function data:AddSlider(text, min, max, default, suffix, cb) return makeSlider(data:AddSection(nil, nil), text, min, max, default, suffix or "", cb) end
