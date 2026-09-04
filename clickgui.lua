@@ -1,4 +1,4 @@
--- AscendHub ClickGUI library
+-- AscendHub ClickGUI library (original visual core)
 -- Usage: local GUI = loadstring(game:HttpGet(URL))(); local ui = GUI.new("My Hub")
 
 local Players = game:GetService("Players")
