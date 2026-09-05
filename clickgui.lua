@@ -524,6 +524,7 @@ end)
 -- ═══ PAGE SYSTEM ═══
 local Pages = {}
 local NavButtons = {}
+local navCount = 0
 local activePage = nil
 
 -- Single settings button in the title bar, matching the reference application.
@@ -543,17 +544,14 @@ local navSelection = ui("Frame", SB, {
     BackgroundTransparency = 0.05,
     BorderSizePixel = 0,
     ZIndex = 3,
+    Visible = false,
 })
 ui("UICorner", navSelection, {CornerRadius = UDim.new(0, 8)})
-local function moveNavSelection(button, instant)
-    if not button or not button.Parent then return end
-    task.defer(function()
-        if not button.Parent then return end
-        local y = button.AbsolutePosition.Y - SB.AbsolutePosition.Y
-        local target = UDim2.new(0, 14, 0, y)
-        if instant or not Settings.Animations then navSelection.Position = target
-        else tw(navSelection, {Position = target}, 0.26, Enum.EasingStyle.Quint) end
-    end)
+local function moveNavSelection(index, instant)
+    local target = UDim2.new(0, 14, 0, 100 + ((index - 1) * 41))
+    navSelection.Visible = true
+    if instant or not Settings.Animations then navSelection.Position = target
+    else tw(navSelection, {Position = target}, 0.26, Enum.EasingStyle.Quint) end
 end
 local topBtn = ui("ImageButton", topDock, {
     Size = UDim2.new(0, 24, 0, 24),
@@ -646,7 +644,7 @@ local function makePage(name)
     -- plain Frame: no CanvasGroup/UIScale — nothing that can shift pixels
     local page = ui("Frame", ContentScroll, {
         Name = name, Size = UDim2.new(1, 0, 0, 0),
-        BackgroundTransparency = 1, Visible = false, ZIndex = 5,
+        BackgroundTransparency = 1, Visible = false, ClipsDescendants = true, ZIndex = 5,
     })
     -- Inner padding gives card outlines room so the edges never cut them.
     ui("UIPadding", page, {
@@ -672,6 +670,7 @@ local function makeSection(parent, title, desc)
         Size = UDim2.new(1, 0, 0, 0),
         BackgroundColor3 = C.CD,
         BorderSizePixel = 0,
+        ClipsDescendants = true,
         ZIndex = 6,
     })
     ui("UICorner", s, {CornerRadius = UDim.new(0, 10)})
@@ -714,6 +713,7 @@ local function makeSection(parent, title, desc)
         Size = UDim2.new(1, -28, 0, 0),
         Position = UDim2.new(0, 14, 0, h),
         BackgroundTransparency = 1,
+        ClipsDescendants = true,
         ZIndex = 7,
     })
     local cl = ui("UIListLayout", content, {
@@ -1568,6 +1568,8 @@ end
 function ClickGUI:SetVisible(value) Main.Visible = value ~= false end
 function ClickGUI:Destroy() if gui then gui:Destroy() end end
 function ClickGUI:AddCategory(name, icon, color)
+    navCount += 1
+    local categoryIndex = navCount
     local page = makePage(name)
     local navBtn = ui("TextButton", navHolder, {Size = UDim2.new(1, 0, 0, 36), BackgroundColor3 = C.SB, BackgroundTransparency = 1, Text = "", BorderSizePixel = 0, ZIndex = 5})
     local lbl = ui("TextLabel", navBtn, {Size = UDim2.new(1, -48, 1, 0), Position = UDim2.new(0, 38, 0, 0), BackgroundTransparency = 1, Text = name, TextColor3 = C.TS, TextSize = 14, Font = FONT, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Center, ZIndex = 6})
@@ -1588,14 +1590,14 @@ function ClickGUI:AddCategory(name, icon, color)
         iconObj.ImageColor3 = C.TX
         activePage = name
         ContentScroll.CanvasPosition = Vector2.new(0, 0)
-        moveNavSelection(navBtn)
+        moveNavSelection(categoryIndex)
     end)
     if activePage == nil then
         activePage = name
         page.Visible = true
         lbl.TextColor3 = C.TX
         iconObj.ImageColor3 = C.TX
-        moveNavSelection(navBtn, true)
+        moveNavSelection(categoryIndex, true)
     end
     function data:AddSection(title, desc)
         local content = makeSection(page, title, desc)
