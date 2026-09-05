@@ -97,6 +97,7 @@ local function ui(cls, p, pr)
     end
     if o:IsA("TextButton") or o:IsA("ImageButton") then
         o.AutoButtonColor = false
+        o.Selectable = false
     end
     if o:IsA("TextLabel") or o:IsA("TextButton") or o:IsA("TextBox") then
         pcall(function()
