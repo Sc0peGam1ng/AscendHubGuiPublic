@@ -617,6 +617,31 @@ local SearchSections = {}
 local SearchEntries = {}
 local SearchDecorations = {}
 
+local function applySearch(query)
+    query = string.lower(tostring(query or "")):gsub("^%s+", ""):gsub("%s+$", "")
+    if query == "" then
+        for name, page in pairs(Pages) do page.Visible = (name == activePage) end
+        for _, entry in ipairs(SearchEntries) do
+            if entry.Instance and entry.Instance.Parent then entry.Instance.Visible = true end
+        end
+        return
+    end
+    for _, page in pairs(Pages) do page.Visible = true end
+    local sectionMatches = {}
+    for _, entry in ipairs(SearchEntries) do
+        local match = string.find(entry.Text or "", query, 1, true) ~= nil
+        if entry.Instance and entry.Instance.Parent then entry.Instance.Visible = match end
+        if match and entry.Section then sectionMatches[entry.Section.Frame] = true end
+    end
+    for content in pairs(SearchSections) do
+        content.Parent.Visible = sectionMatches[SearchSections[content].Frame] == true
+    end
+end
+
+searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    applySearch(searchBox.Text)
+end)
+
 local function makePage(name)
     -- plain Frame: no CanvasGroup/UIScale — nothing that can shift pixels
     local page = ui("Frame", ContentScroll, {
@@ -798,8 +823,6 @@ local function makeToggle(parent, text, desc, default, cb)
         if cb then cb(state) end
     end)
 
-    btn.MouseEnter:Connect(function() tw(row, {BackgroundColor3 = C.SBA}, 0.12) end)
-    btn.MouseLeave:Connect(function() tw(row, {BackgroundColor3 = C.CDH}, 0.12) end)
 end
 
 -- ═══ ACCENT ═══
@@ -978,8 +1001,6 @@ local function makeButton(parent, text, accent, cb)
     btn.MouseButton1Click:Connect(function()
         if cb then cb() end
     end)
-    btn.MouseEnter:Connect(function() tw(btn, {BackgroundColor3 = getBase():Lerp(C.WH, 0.14)}, 0.12) end)
-    btn.MouseLeave:Connect(function() tw(btn, {BackgroundColor3 = getBase()}, 0.18) end)
 end
 
 local function makeDivider(parent)
@@ -1065,8 +1086,6 @@ local function makeDropdown(parent, text, options, default, cb)
                 TextYAlignment = Enum.TextYAlignment.Center,
                 ZIndex = 33,
             })
-            optBtn.MouseEnter:Connect(function() tw(optBtn, {BackgroundColor3 = C.SBA}, 0.08) end)
-            optBtn.MouseLeave:Connect(function() tw(optBtn, {BackgroundColor3 = (i == index) and C.SBA or C.CDH}, 0.08) end)
             optBtn.MouseButton1Click:Connect(function()
                 index = i
                 value.Text = opt
@@ -1090,8 +1109,6 @@ local function makeDropdown(parent, text, options, default, cb)
         end)
     end)
 
-    row.MouseEnter:Connect(function() tw(row, {BackgroundColor3 = C.SBA}, 0.1) end)
-    row.MouseLeave:Connect(function() tw(row, {BackgroundColor3 = C.CDH}, 0.1) end)
 end
 
 local function makeTextInput(parent, text, initial, placeholder, cb)
@@ -1129,8 +1146,6 @@ local function makeKeybind(parent, text, default, cb)
             if cb then cb(input.KeyCode) end
         end
     end)
-    row.MouseEnter:Connect(function() tw(row, {BackgroundColor3 = C.SBA}, 0.1) end)
-    row.MouseLeave:Connect(function() tw(row, {BackgroundColor3 = C.CDH}, 0.1) end)
 end
 
 -- ═══ COLOR PICKER ═══
@@ -1398,8 +1413,6 @@ local function makeColorRow(parent, text, default, cb)
             if cb then cb(col) end
         end)
     end)
-    row.MouseEnter:Connect(function() tw(row, {BackgroundColor3 = C.SBA}, 0.1) end)
-    row.MouseLeave:Connect(function() tw(row, {BackgroundColor3 = C.CDH}, 0.1) end)
 end
 
 local function makeThemePicker(parent)
