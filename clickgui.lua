@@ -532,6 +532,28 @@ local topDock = ui("Frame", TB, {
     Visible = false,
     ZIndex = 6,
 })
+
+-- Selection surface stays outside the list so it never changes button layout.
+local navSelection = ui("Frame", SB, {
+    Size = UDim2.new(1, -28, 0, 36),
+    Position = UDim2.new(0, 14, 0, 100),
+    BackgroundColor3 = C.SBA,
+    BackgroundTransparency = 0.08,
+    BorderSizePixel = 0,
+    ZIndex = 4,
+})
+ui("UICorner", navSelection, {CornerRadius = UDim.new(0, 8)})
+ui("UIStroke", navSelection, {Color = C.GR, Thickness = 1, Transparency = 0.55})
+local function moveNavSelection(button, instant)
+    if not button or not button.Parent then return end
+    task.defer(function()
+        if not button.Parent then return end
+        local y = button.AbsolutePosition.Y - SB.AbsolutePosition.Y
+        local target = UDim2.new(0, 14, 0, y)
+        if instant or not Settings.Animations then navSelection.Position = target
+        else tw(navSelection, {Position = target}, 0.26, Enum.EasingStyle.Quint) end
+    end)
+end
 local topBtn = ui("ImageButton", topDock, {
     Size = UDim2.new(0, 24, 0, 24),
     Position = UDim2.new(0.5, -12, 0.5, -12),
@@ -1541,15 +1563,33 @@ function ClickGUI:AddCategory(name, icon, color)
         for pageName, otherPage in pairs(Pages) do
             otherPage.Visible = pageName == name
         end
-        for _, item in pairs(NavButtons) do item.lbl.TextColor3 = C.TS end
+        for _, item in pairs(NavButtons) do item.lbl.TextColor3 = C.TS; item.icon.ImageColor3 = C.TS end
         lbl.TextColor3 = C.TX
+        iconObj.ImageColor3 = C.TX
         activePage = name
         ContentScroll.CanvasPosition = Vector2.new(0, 0)
+        moveNavSelection(navBtn)
+    end)
+    navBtn.MouseEnter:Connect(function()
+        if activePage ~= name then
+            tw(navBtn, {BackgroundColor3 = C.SBH, BackgroundTransparency = 0.15}, 0.12)
+            tw(lbl, {TextColor3 = C.TX}, 0.12)
+            tw(iconObj, {ImageColor3 = C.TX}, 0.12)
+        end
+    end)
+    navBtn.MouseLeave:Connect(function()
+        if activePage ~= name then
+            tw(navBtn, {BackgroundTransparency = 1}, 0.16)
+            tw(lbl, {TextColor3 = C.TS}, 0.16)
+            tw(iconObj, {ImageColor3 = C.TS}, 0.16)
+        end
     end)
     if activePage == nil then
         activePage = name
         page.Visible = true
         lbl.TextColor3 = C.TX
+        iconObj.ImageColor3 = C.TX
+        moveNavSelection(navBtn, true)
     end
     function data:AddSection(title, desc)
         local content = makeSection(page, title, desc)
