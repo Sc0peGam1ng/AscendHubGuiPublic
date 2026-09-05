@@ -377,7 +377,7 @@ SB = ui("Frame", Main, {
     ZIndex = 3,
 })
 -- round the sidebar so the window's bottom-left corner stays rounded
-ui("UICorner", SB, {CornerRadius = UDim.new(0, 12)})
+ui("UICorner", SB, {CornerRadius = UDim.new(0, 0)})
 ui("TextLabel", SB, {
     Size = UDim2.new(1, -28, 0, 28),
     Position = UDim2.new(0, 14, 0, 14),
@@ -493,7 +493,7 @@ ui("UIGradient", ambientGlow, {
     Rotation = 90,
 })
 -- round the content so the window's bottom-right corner stays rounded
-ui("UICorner", Content, {CornerRadius = UDim.new(0, 12)})
+ui("UICorner", Content, {CornerRadius = UDim.new(0, 0)})
 local ContentScroll = ui("ScrollingFrame", Content, {
     Size = UDim2.new(1, -28, 1, -18),
     Position = UDim2.new(0, 14, 0, 9),
@@ -539,13 +539,12 @@ local topDock = ui("Frame", TB, {
 local navSelection = ui("Frame", SB, {
     Size = UDim2.new(1, -28, 0, 36),
     Position = UDim2.new(0, 14, 0, 100),
-    BackgroundColor3 = C.SBA,
-    BackgroundTransparency = 0.08,
+    BackgroundColor3 = C.SBH,
+    BackgroundTransparency = 0.05,
     BorderSizePixel = 0,
-    ZIndex = 4,
+    ZIndex = 3,
 })
 ui("UICorner", navSelection, {CornerRadius = UDim.new(0, 8)})
-ui("UIStroke", navSelection, {Color = C.GR, Thickness = 1, Transparency = 0.55})
 local function moveNavSelection(button, instant)
     if not button or not button.Parent then return end
     task.defer(function()
