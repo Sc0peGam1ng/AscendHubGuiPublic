@@ -993,15 +993,16 @@ local function makeDivider(parent)
 end
 
 local function makeDropdown(parent, text, options, default, cb)
-    local row = ui("TextButton", parent, {
+    local row = ui("Frame", parent, {
         Size = UDim2.new(1, -8, 0, 38), BackgroundColor3 = C.CDH,
-        Text = "", BorderSizePixel = 0, ClipsDescendants = true, ZIndex = 8,
+        BorderSizePixel = 0, ClipsDescendants = true, ZIndex = 8,
     })
     registerSearchEntry(row, parent, text, table.concat(options, " "))
     ui("UICorner", row, {CornerRadius = UDim.new(0, 8)})
     ui("TextLabel", row, {Size = UDim2.new(0.5, 0, 1, 0), Position = UDim2.new(0, 12, 0, 0), BackgroundTransparency = 1, Text = text, TextColor3 = C.TX, TextSize = 14, Font = FONT, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Center, ZIndex = 9})
     local value = ui("TextLabel", row, {Size = UDim2.fromOffset(116, 38), Position = UDim2.new(1, -28, 0, 0), AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 1, Text = default or options[1], TextColor3 = C.TS, TextSize = 13, Font = FONT, TextXAlignment = Enum.TextXAlignment.Right, TextYAlignment = Enum.TextYAlignment.Center, ZIndex = 9})
     local arrow = ui("TextLabel", row, {Size = UDim2.fromOffset(18, 38), Position = UDim2.new(1, -6, 0, 0), AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 1, Text = "▼", TextColor3 = C.TS, TextSize = 10, Font = FONT_BOLD, TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Center, ZIndex = 9})
+    local hit = ui("TextButton", row, {Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Text = "", BorderSizePixel = 0, ZIndex = 10})
     local index = table.find(options, default) or 1
 
     -- slide-out options window below the row
@@ -1016,7 +1017,7 @@ local function makeDropdown(parent, text, options, default, cb)
         task.delay(0.18, function() p:Destroy() end)
     end
 
-    row.MouseButton1Click:Connect(function()
+    hit.MouseButton1Click:Connect(function()
         if popup then closePopup() return end
         local w, h = 190, #options * 34 + 10
         catcher = ui("TextButton", Main, {
