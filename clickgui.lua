@@ -26,9 +26,9 @@ local C = {
     SB = Color3.fromRGB(20, 22, 25),
     SBH = Color3.fromRGB(33, 36, 40),
     SBA = Color3.fromRGB(40, 44, 49),
-    CT = Color3.fromRGB(28, 31, 35),
-    CD = Color3.fromRGB(32, 35, 39),
-    CDH = Color3.fromRGB(39, 43, 48),
+    CT = Color3.fromRGB(34, 38, 43),
+    CD = Color3.fromRGB(39, 43, 49),
+    CDH = Color3.fromRGB(45, 50, 56),
     GR = Color3.fromRGB(48, 210, 128),
     GRD = Color3.fromRGB(30, 165, 95),
     TX = Color3.fromRGB(235, 236, 234),
@@ -1079,10 +1079,11 @@ local function makeDropdown(parent, text, options, default, cb)
         task.defer(function()
             if not popup then return end
             local rel = row.AbsolutePosition - Main.AbsolutePosition
+            local x = math.clamp(rel.X + 14, 8, math.max(8, Main.AbsoluteSize.X - w - 8))
             if rel.Y + row.AbsoluteSize.Y + 6 + h > Main.AbsoluteSize.Y - 8 then
-                popup.Position = UDim2.new(0, rel.X + 14, 0, rel.Y - h - 6)
+                popup.Position = UDim2.new(0, x, 0, rel.Y - h - 6)
             else
-                popup.Position = UDim2.new(0, rel.X + 14, 0, rel.Y + row.AbsoluteSize.Y + 6)
+                popup.Position = UDim2.new(0, x, 0, rel.Y + row.AbsoluteSize.Y + 6)
             end
             popup.Size = UDim2.new(0, w, 0, 0)
             tw(popup, {Size = UDim2.new(0, w, 0, h)}, 0.22, Enum.EasingStyle.Quint)
@@ -1575,20 +1576,6 @@ function ClickGUI:AddCategory(name, icon, color)
         activePage = name
         ContentScroll.CanvasPosition = Vector2.new(0, 0)
         moveNavSelection(navBtn)
-    end)
-    navBtn.MouseEnter:Connect(function()
-        if activePage ~= name then
-            tw(navBtn, {BackgroundColor3 = C.SBH, BackgroundTransparency = 0.15}, 0.12)
-            tw(lbl, {TextColor3 = C.TX}, 0.12)
-            tw(iconObj, {ImageColor3 = C.TX}, 0.12)
-        end
-    end)
-    navBtn.MouseLeave:Connect(function()
-        if activePage ~= name then
-            tw(navBtn, {BackgroundColor3 = C.SB, BackgroundTransparency = 1}, 0.16)
-            tw(lbl, {TextColor3 = C.TS}, 0.16)
-            tw(iconObj, {ImageColor3 = C.TS}, 0.16)
-        end
     end)
     if activePage == nil then
         activePage = name
