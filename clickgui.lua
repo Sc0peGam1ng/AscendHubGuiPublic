@@ -58,6 +58,24 @@ local ICONS = {
     Shop = "rbxassetid://10734952479",
     Misc = "rbxassetid://10734963191",
 }
+local CATEGORY_ICONS = {
+    house = ICONS.Main,
+    pickaxe = ICONS.Farm,
+    dices = ICONS.Farm,
+    route = ICONS.Farm,
+    ["shopping-cart"] = ICONS.Shop,
+    ["paw-print"] = ICONS.Main,
+    gift = ICONS.Shop,
+    settings = ICONS.Misc,
+}
+local function resolveIcon(icon, categoryName)
+    if type(icon) ~= "string" or icon == "" then
+        return CATEGORY_ICONS[string.lower(tostring(categoryName or ""))] or ICONS.Main
+    end
+    if icon:match("^rbxasset") or icon:match("^rbxgameasset") then return icon end
+    local key = icon:lower():gsub("^lucide/", "")
+    return CATEGORY_ICONS[key] or CATEGORY_ICONS[string.lower(tostring(categoryName or ""))] or ICONS.Main
+end
 local function tw(o, p, d, s)
     if not Settings.Animations then
         for k, v in pairs(p) do o[k] = v end
@@ -506,6 +524,7 @@ local topDock = ui("Frame", TB, {
     Size = UDim2.new(0, 42, 1, 0),
     Position = UDim2.new(0.5, -21, 0, 0),
     BackgroundTransparency = 1,
+    Visible = false,
     ZIndex = 6,
 })
 local topBtn = ui("ImageButton", topDock, {
@@ -1510,7 +1529,7 @@ function ClickGUI:AddCategory(name, icon, color)
     local page = makePage(name)
     local navBtn = ui("TextButton", navHolder, {Size = UDim2.new(1, 0, 0, 36), BackgroundTransparency = 1, Text = "", BorderSizePixel = 0, ZIndex = 5})
     local lbl = ui("TextLabel", navBtn, {Size = UDim2.new(1, -48, 1, 0), Position = UDim2.new(0, 38, 0, 0), BackgroundTransparency = 1, Text = name, TextColor3 = C.TS, TextSize = 14, Font = FONT, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Center, ZIndex = 6})
-    local iconObj = ui("ImageLabel", navBtn, {Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(0, 12, 0.5, -10), BackgroundTransparency = 1, Image = icon or ICONS.Main, ImageColor3 = color or C.TX, ImageTransparency = 0.05, ScaleType = Enum.ScaleType.Fit, ZIndex = 6})
+    local iconObj = ui("ImageLabel", navBtn, {Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(0, 12, 0.5, -10), BackgroundTransparency = 1, Image = resolveIcon(icon, name), ImageColor3 = color or C.TX, ImageTransparency = 0.05, ScaleType = Enum.ScaleType.Fit, ZIndex = 6})
     local data = {Name = name, Page = page, Button = navBtn}
     NavButtons[name] = {btn = navBtn, lbl = lbl, icon = iconObj}
     navBtn.MouseButton1Click:Connect(function()
@@ -1522,17 +1541,31 @@ function ClickGUI:AddCategory(name, icon, color)
         activePage = name
         ContentScroll.CanvasPosition = Vector2.new(0, 0)
     end)
-    function data:AddSection(title, desc) return makeSection(page, title, desc) end
-    function data:AddLabel(text)
-        local section = makeSection(page, nil, nil)
-        local label = ui("TextLabel", section, {Size = UDim2.new(1, 0, 0, 28), BackgroundTransparency = 1, Text = tostring(text or ""), TextColor3 = C.TS, TextSize = 13, Font = FONT, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 8})
-        return {SetText = function(_, value) label.Text = tostring(value or "") end}
+    if activePage == nil then
+        activePage = name
+        page.Visible = true
+        lbl.TextColor3 = C.TX
     end
-    function data:AddToggle(text, default, cb) return makeToggle(data:AddSection(nil, nil), text, nil, default, cb) end
-    function data:AddButton(text, cb) return makeButton(data:AddSection(nil, nil), text, nil, cb) end
-    function data:AddSlider(text, min, max, default, suffix, cb) return makeSlider(data:AddSection(nil, nil), text, min, max, default, suffix or "", cb) end
-    function data:AddDropdown(text, options, default, cb) return makeDropdown(data:AddSection(nil, nil), text, options, default, cb) end
-    function data:AddInput(text, initial, placeholder, cb) return makeTextInput(data:AddSection(nil, nil), text, initial, placeholder, cb) end
+    function data:AddSection(title, desc)
+        local content = makeSection(page, title, desc)
+        local section = {Frame = content}
+        function section:AddLabel(text)
+            local label = ui("TextLabel", content, {Size = UDim2.new(1, 0, 0, 28), BackgroundTransparency = 1, Text = tostring(text or ""), TextColor3 = C.TS, TextSize = 13, Font = FONT, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 8})
+            return {SetText = function(_, value) label.Text = tostring(value or "") end}
+        end
+        function section:AddToggle(text, default, cb) return makeToggle(content, text, nil, default, cb) end
+        function section:AddButton(text, cb) return makeButton(content, text, nil, cb) end
+        function section:AddSlider(text, min, max, default, suffix, cb) return makeSlider(content, text, min, max, default, suffix or "", cb) end
+        function section:AddDropdown(text, options, default, cb) return makeDropdown(content, text, options, default, cb) end
+        function section:AddInput(text, initial, placeholder, cb) return makeTextInput(content, text, initial, placeholder, cb) end
+        return section
+    end
+    function data:AddLabel(text) return data:AddSection(nil, nil):AddLabel(text) end
+    function data:AddToggle(text, default, cb) return data:AddSection(nil, nil):AddToggle(text, default, cb) end
+    function data:AddButton(text, cb) return data:AddSection(nil, nil):AddButton(text, cb) end
+    function data:AddSlider(text, min, max, default, suffix, cb) return data:AddSection(nil, nil):AddSlider(text, min, max, default, suffix, cb) end
+    function data:AddDropdown(text, options, default, cb) return data:AddSection(nil, nil):AddDropdown(text, options, default, cb) end
+    function data:AddInput(text, initial, placeholder, cb) return data:AddSection(nil, nil):AddInput(text, initial, placeholder, cb) end
     return data
 end
 function ClickGUI:Notify(title, message, duration) notify(title, message, duration) end
