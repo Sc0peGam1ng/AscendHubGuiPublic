@@ -460,7 +460,7 @@ Content = ui("Frame", Main, {
     Size = UDim2.new(1, -210, 1, -56),
     Position = UDim2.new(0, 210, 0, 56),
     BackgroundColor3 = C.CT,
-    BackgroundTransparency = 0.04,
+    BackgroundTransparency = 0,
     BorderSizePixel = 0,
     ZIndex = 3,
     ClipsDescendants = true,
@@ -473,6 +473,7 @@ local contentGradient = ui("UIGradient", Content, {
     }),
     Rotation = 24,
 })
+contentGradient.Enabled = false
 local ambientGlow = ui("Frame", Content, {
     Size = UDim2.new(1, 0, 0, 190),
     Position = UDim2.new(0, 0, 0, 0),
@@ -481,6 +482,7 @@ local ambientGlow = ui("Frame", Content, {
     BorderSizePixel = 0,
     ZIndex = 1,
 })
+ambientGlow.Visible = false
 ui("UIGradient", ambientGlow, {
     Color = ColorSequence.new(C.GR, C.GR),
     Transparency = NumberSequence.new({
@@ -1554,7 +1556,7 @@ function ClickGUI:SetVisible(value) Main.Visible = value ~= false end
 function ClickGUI:Destroy() if gui then gui:Destroy() end end
 function ClickGUI:AddCategory(name, icon, color)
     local page = makePage(name)
-    local navBtn = ui("TextButton", navHolder, {Size = UDim2.new(1, 0, 0, 36), BackgroundTransparency = 1, Text = "", BorderSizePixel = 0, ZIndex = 5})
+    local navBtn = ui("TextButton", navHolder, {Size = UDim2.new(1, 0, 0, 36), BackgroundColor3 = C.SB, BackgroundTransparency = 1, Text = "", BorderSizePixel = 0, ZIndex = 5})
     local lbl = ui("TextLabel", navBtn, {Size = UDim2.new(1, -48, 1, 0), Position = UDim2.new(0, 38, 0, 0), BackgroundTransparency = 1, Text = name, TextColor3 = C.TS, TextSize = 14, Font = FONT, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Center, ZIndex = 6})
     local iconObj = ui("ImageLabel", navBtn, {Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(0, 12, 0.5, -10), BackgroundTransparency = 1, Image = resolveIcon(icon, name), ImageColor3 = color or C.TX, ImageTransparency = 0.05, ScaleType = Enum.ScaleType.Fit, ZIndex = 6})
     local data = {Name = name, Page = page, Button = navBtn}
@@ -1563,7 +1565,12 @@ function ClickGUI:AddCategory(name, icon, color)
         for pageName, otherPage in pairs(Pages) do
             otherPage.Visible = pageName == name
         end
-        for _, item in pairs(NavButtons) do item.lbl.TextColor3 = C.TS; item.icon.ImageColor3 = C.TS end
+        for _, item in pairs(NavButtons) do
+            item.btn.BackgroundColor3 = C.SB
+            item.btn.BackgroundTransparency = 1
+            item.lbl.TextColor3 = C.TS
+            item.icon.ImageColor3 = C.TS
+        end
         lbl.TextColor3 = C.TX
         iconObj.ImageColor3 = C.TX
         activePage = name
@@ -1579,7 +1586,7 @@ function ClickGUI:AddCategory(name, icon, color)
     end)
     navBtn.MouseLeave:Connect(function()
         if activePage ~= name then
-            tw(navBtn, {BackgroundTransparency = 1}, 0.16)
+            tw(navBtn, {BackgroundColor3 = C.SB, BackgroundTransparency = 1}, 0.16)
             tw(lbl, {TextColor3 = C.TS}, 0.16)
             tw(iconObj, {ImageColor3 = C.TS}, 0.16)
         end
