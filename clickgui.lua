@@ -587,30 +587,7 @@ local settingsText = ui("TextLabel", settingsTooltip, {
 })
 local tooltipHovered = false
 local tooltipSerial = 0
-topBtn.MouseEnter:Connect(function()
-    tooltipHovered = true
-    tooltipSerial += 1
-    local serial = tooltipSerial
-    settingsTooltip.Visible = true
-    settingsTooltip.Position = UDim2.new(1, -2, 0.5, -14)
-    topBtn.ImageColor3 = C.TX
-    tw(topBtn, {Rotation = topBtn.Rotation + 180}, 0.28, Enum.EasingStyle.Quint)
-    for i = 1, #"Settings" do
-        task.delay((i - 1) * 0.018, function()
-            if tooltipHovered and serial == tooltipSerial then settingsText.MaxVisibleGraphemes = i end
-        end)
-    end
-end)
-topBtn.MouseLeave:Connect(function()
-    tooltipHovered = false
-    tooltipSerial += 1
-    topBtn.ImageColor3 = C.TS
-    tw(topBtn, {Rotation = 0}, 0.2, Enum.EasingStyle.Quad)
-    settingsText.MaxVisibleGraphemes = 0
-    task.delay(0.1, function()
-        if not tooltipHovered then settingsTooltip.Visible = false end
-    end)
-end)
+-- Hover is intentionally inert across the library.
 
 local SearchSections = {}
 local SearchEntries = {}
@@ -1493,8 +1470,6 @@ local function makeThemePicker(parent)
         ui("Frame", preview, {Size = UDim2.new(1, -12, 0, 3), Position = UDim2.new(0, 4, 0, 13), BackgroundColor3 = Color3.new(1, 1, 1), BackgroundTransparency = 0.45, BorderSizePixel = 0, ZIndex = 11})
         ui("TextLabel", card, {Size = UDim2.new(1, -50, 0, 18), Position = UDim2.new(0, 48, 0.5, -9), BackgroundTransparency = 1, Text = item[1], TextColor3 = C.TX, TextSize = 12, Font = FONT_BOLD, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Center, ZIndex = 10})
         themeCards[i] = {card = card, stroke = cardStroke}
-        card.MouseEnter:Connect(function() tw(card, {BackgroundColor3 = C.CDH}, 0.12) end)
-        card.MouseLeave:Connect(function() tw(card, {BackgroundColor3 = C.CD}, 0.12) end)
         card.MouseButton1Click:Connect(function()
             selectedTheme = i
             for index, data in ipairs(themeCards) do
