@@ -22,13 +22,13 @@ gui.AutoLocalize = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local C = {
-    BG = Color3.fromRGB(24, 26, 29),
-    SB = Color3.fromRGB(20, 22, 25),
-    SBH = Color3.fromRGB(33, 36, 40),
-    SBA = Color3.fromRGB(40, 44, 49),
-    CT = Color3.fromRGB(34, 38, 43),
-    CD = Color3.fromRGB(39, 43, 49),
-    CDH = Color3.fromRGB(45, 50, 56),
+    BG = Color3.fromRGB(26, 30, 35),
+    SB = Color3.fromRGB(22, 26, 31),
+    SBH = Color3.fromRGB(35, 41, 48),
+    SBA = Color3.fromRGB(43, 50, 58),
+    CT = Color3.fromRGB(32, 38, 45),
+    CD = Color3.fromRGB(39, 46, 54),
+    CDH = Color3.fromRGB(47, 55, 64),
     GR = Color3.fromRGB(48, 210, 128),
     GRD = Color3.fromRGB(30, 165, 95),
     TX = Color3.fromRGB(235, 236, 234),
@@ -1076,6 +1076,8 @@ local function makeDropdown(parent, text, options, default, cb)
         arrow.Text = "▲"
         task.defer(function()
             if not popup then return end
+            task.wait(0.05)
+            if not popup or not row.Parent then return end
             local rel = row.AbsolutePosition - Main.AbsolutePosition
             local x = math.clamp(rel.X + 14, 8, math.max(8, Main.AbsoluteSize.X - w - 8))
             if rel.Y + row.AbsoluteSize.Y + 6 + h > Main.AbsoluteSize.Y - 8 then
