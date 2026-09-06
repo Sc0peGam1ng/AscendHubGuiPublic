@@ -22,13 +22,13 @@ gui.AutoLocalize = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local C = {
-    BG = Color3.fromRGB(25, 27, 29),
-    SB = Color3.fromRGB(20, 22, 24),
-    SBH = Color3.fromRGB(32, 35, 38),
-    SBA = Color3.fromRGB(40, 43, 47),
-    CT = Color3.fromRGB(29, 31, 34),
-    CD = Color3.fromRGB(35, 37, 40),
-    CDH = Color3.fromRGB(41, 44, 47),
+    BG = Color3.fromRGB(19, 21, 23),
+    SB = Color3.fromRGB(16, 18, 20),
+    SBH = Color3.fromRGB(27, 30, 33),
+    SBA = Color3.fromRGB(34, 37, 41),
+    CT = Color3.fromRGB(23, 25, 28),
+    CD = Color3.fromRGB(29, 31, 34),
+    CDH = Color3.fromRGB(35, 38, 42),
     GR = Color3.fromRGB(76, 214, 154),
     GRD = Color3.fromRGB(45, 157, 111),
     TX = Color3.fromRGB(235, 236, 234),
@@ -127,7 +127,7 @@ ui("UIStroke", Main, {Color = Color3.fromRGB(58, 61, 60), Thickness = 1.5, Trans
 local mainGradient = ui("UIGradient", Main, {
     Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, C.BG),
-        ColorSequenceKeypoint.new(0.55, C.CD),
+        ColorSequenceKeypoint.new(0.55, C.BG),
         ColorSequenceKeypoint.new(1, C.SB),
     }),
     Rotation = 28,
@@ -370,15 +370,24 @@ end)
 
 -- ═══ SIDEBAR ═══
 SB = ui("Frame", Main, {
-    Size = UDim2.new(0, 210, 1, -56),
+    Size = UDim2.new(0, 210, 1, -68),
     Position = UDim2.new(0, 0, 0, 56),
     BackgroundColor3 = C.SB,
     BackgroundTransparency = 0.08,
     BorderSizePixel = 0,
     ZIndex = 3,
 })
--- round the sidebar so the window's bottom-left corner stays rounded
-ui("UICorner", SB, {CornerRadius = UDim.new(0, 0)})
+-- Keep the bottom-left corner rounded; the small top patch below closes the
+-- inner corner so no background pixel leaks under the titlebar.
+ui("UICorner", SB, {CornerRadius = UDim.new(0, 12)})
+ui("Frame", Main, {
+    Size = UDim2.fromOffset(14, 14),
+    Position = UDim2.new(0, 0, 0, 56),
+    BackgroundColor3 = C.SB,
+    BackgroundTransparency = 0.08,
+    BorderSizePixel = 0,
+    ZIndex = 4,
+})
 ui("TextLabel", SB, {
     Size = UDim2.new(1, -28, 0, 28),
     Position = UDim2.new(0, 14, 0, 14),
@@ -458,7 +467,7 @@ local NavItems = {}
 
 -- ═══ CONTENT ═══
 Content = ui("Frame", Main, {
-    Size = UDim2.new(1, -210, 1, -56),
+    Size = UDim2.new(1, -210, 1, -68),
     Position = UDim2.new(0, 210, 0, 56),
     BackgroundColor3 = C.CT,
     BackgroundTransparency = 0,
@@ -493,8 +502,16 @@ ui("UIGradient", ambientGlow, {
     }),
     Rotation = 90,
 })
--- round the content so the window's bottom-right corner stays rounded
-ui("UICorner", Content, {CornerRadius = UDim.new(0, 0)})
+-- Match the outer window at the bottom-right while the titlebar keeps the
+-- inner top edge square and flush.
+ui("UICorner", Content, {CornerRadius = UDim.new(0, 12)})
+ui("Frame", Main, {
+    Size = UDim2.fromOffset(14, 14),
+    Position = UDim2.new(1, -14, 0, 56),
+    BackgroundColor3 = C.CT,
+    BorderSizePixel = 0,
+    ZIndex = 4,
+})
 local ContentScroll = ui("ScrollingFrame", Content, {
     Size = UDim2.new(1, -28, 1, -18),
     Position = UDim2.new(0, 14, 0, 9),
